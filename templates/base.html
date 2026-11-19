@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Préstamos de Laboratorio{% endblock %} - UNCP</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f4f6f8; color: #1c2733; }
+    header { background: #12395f; color: #fff; padding: .8rem 1.5rem; display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+    header a, header button { color: #fff; text-decoration: none; background: none; border: 0; font: inherit; cursor: pointer; }
+    header .marca { font-weight: 700; margin-right: auto; }
+    main { max-width: 980px; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: #fff; border-radius: 8px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 3px #0002; margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #e2e6ea; }
+    .msg { padding: .7rem 1rem; border-radius: 6px; margin-bottom: .6rem; }
+    .msg.success { background: #d9f2e1; } .msg.error { background: #fadbd8; }
+    .msg.warning { background: #fdebc8; } .msg.info { background: #d6e9f8; }
+    .errorlist { color: #b00020; list-style: none; padding: 0; margin: .2rem 0; }
+    input, select, textarea { padding: .45rem; width: 100%; max-width: 420px; box-sizing: border-box; }
+    .btn { background: #12395f; color: #fff; border: 0; padding: .5rem 1rem; border-radius: 6px; cursor: pointer; }
+    .btn.peligro { background: #b00020; }
+  </style>
+</head>
+<body>
+<header>
+  <span class="marca">Préstamos de Laboratorio - FISI UNCP</span>
+  <a href="{% url 'catalogo' %}">Catálogo</a>
+  {% if user.is_authenticated %}
+    <a href="{% url 'prestamos' %}">Préstamos</a>
+    {% if rol_docente or rol_asistente %}<a href="{% url 'solicitar_prestamo' %}">Nuevo préstamo</a>{% endif %}
+    {% if rol_admin %}<a href="{% url 'auditoria' %}">Auditoría</a><a href="{% url 'admin:index' %}">Admin</a>{% endif %}
+    <span>{{ user.get_username }}</span>
+    <form method="post" action="{% url 'logout' %}" style="display:inline">{% csrf_token %}<button type="submit">Salir</button></form>
+  {% else %}
+    <a href="{% url 'login' %}">Ingresar</a>
+  {% endif %}
+</header>
+<main>
+  {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>
