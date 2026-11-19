@@ -93,3 +93,20 @@ class PrestamoForm(forms.ModelForm):
                 f"{equipo.nombre}; solicitó {cantidad}.",
             )
         return cleaned
+
+
+class DevolucionForm(forms.ModelForm):
+    """Registro de devolución con el estado del equipo al retornar."""
+
+    class Meta:
+        model = Prestamo
+        fields = ["estado_equipo_devolucion", "observaciones"]
+        widgets = {"observaciones": forms.Textarea(attrs={"rows": 3})}
+        labels = {"estado_equipo_devolucion": "Estado del equipo al retornar"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["estado_equipo_devolucion"].required = True
+
+    def clean_observaciones(self):
+        return sanitizar_texto(self.cleaned_data.get("observaciones"))
