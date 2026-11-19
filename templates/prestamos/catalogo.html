@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Catálogo{% endblock %}
+{% block contenido %}
+<div class="card">
+  <h2>Catálogo de equipos</h2>
+  <table>
+    <tr><th>Código</th><th>Equipo</th><th>Laboratorio</th><th>Estado</th><th>Disponible</th>{% if rol_admin %}<th></th>{% endif %}</tr>
+    {% for e in equipos %}
+    <tr>
+      <td>{{ e.codigo_patrimonial }}</td>
+      <td>{{ e.nombre }} ({{ e.marca }} {{ e.modelo }})</td>
+      <td>{{ e.laboratorio }}</td>
+      <td style="color:{{ e.color_estado }};font-weight:600">{{ e.get_estado_display }}</td>
+      <td>{{ e.stock_disponible }} / {{ e.stock_total }}</td>
+      {% if rol_admin %}
+      <td><form method="post" action="{% url 'eliminar_equipo' e.pk %}">{% csrf_token %}<button class="btn peligro" type="submit">Eliminar</button></form></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

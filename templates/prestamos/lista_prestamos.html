@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Préstamos{% endblock %}
+{% block contenido %}
+<div class="card">
+  <h2>{% if rol_admin or rol_asistente %}Todos los préstamos{% else %}Mis préstamos{% endif %}</h2>
+  <table>
+    <tr><th>Docente</th><th>Equipo</th><th>Cant.</th><th>Préstamo</th><th>Devolución</th><th>Estado</th><th>Retraso</th>{% if rol_asistente %}<th></th>{% endif %}</tr>
+    {% for p in prestamos %}
+    <tr>
+      <td>{{ p.docente.get_full_name|default:p.docente.username }}</td>
+      <td>{{ p.equipo.codigo_patrimonial }}</td>
+      <td>{{ p.cantidad }}</td>
+      <td>{{ p.fecha_prestamo|date:"d/m/Y" }}</td>
+      <td>{{ p.fecha_devolucion_prevista|date:"d/m/Y" }}</td>
+      <td>{{ p.get_estado_display }}</td>
+      <td>{{ p.dias_retraso }} d</td>
+      {% if rol_asistente %}
+      <td>{% if p.estado != "devuelto" %}<a class="btn" href="{% url 'devolver' p.pk %}">Devolver</a>{% endif %}</td>
+      {% endif %}
+    </tr>
+    {% empty %}<tr><td colspan="8">Sin préstamos registrados.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
