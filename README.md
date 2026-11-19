@@ -47,12 +47,34 @@ templates/     plantillas
 - `dev/integrante-1`: modelos, formularios, validaciones, admin, plantillas.
 - `dev/integrante-2`: settings, middleware, autenticación, autorización, sesiones.
 
+## Datos de prueba
+```powershell
+python manage.py cargar_datos
+```
+Usuarios (clave `Uncp2026*`): `admin1` (admin), `doc1`, `doc2`, `doc3` (docentes), `asist1` (asistente).
+
+## Rutas
+| Ruta | Acceso |
+|---|---|
+| `/catalogo/` | público (invitado) |
+| `/login/`, `/logout/` | público |
+| `/prestamos/` | admin, asistente (todos) / docente (propios) |
+| `/prestamos/nuevo/` | docente, asistente |
+| `/prestamos/<id>/devolver/` | solo asistente |
+| `/equipos/<id>/eliminar/` | solo admin (POST) |
+| `/auditoria/` | solo admin |
+| `/admin/` | staff (Django Admin personalizado) |
+
+## Seguridad
+CSRF en todos los formularios POST, contraseñas con PBKDF2, cookies de sesión HttpOnly,
+timeout de 30 min por inactividad, `select_related()` en listados (sin N+1).
+
 ## Avance
-- [x] Esqueleto del proyecto y configuración de sesiones/cookies
-- [x] Modelos: Laboratorio, Equipo, Prestamo, RegistroAuditoria
-- [x] Roles y constantes de autorización
-- [ ] Formularios con validaciones (RF2)
-- [ ] Django Admin personalizado (RF1, RF5)
-- [ ] Middleware de auditoría (RF4)
-- [ ] Login/logout y vistas protegidas por rol (RF3)
-- [ ] Datos de prueba (10 equipos, 5 usuarios, 15 préstamos)
+- [x] Esqueleto, sesiones y cookies seguras
+- [x] Modelos y roles
+- [x] Formularios con validaciones y sanitización (RF2)
+- [x] Django Admin personalizado (RF1, RF5)
+- [x] Middleware de auditoría y de préstamos vencidos (RF4)
+- [x] Login/logout y vistas protegidas por rol (RF3)
+- [x] Datos de prueba
+- [ ] Capturas de evidencia (informe PDF)
