@@ -47,3 +47,31 @@ class AuditoriaMiddleware:
                 "INTENTO SIN AUTENTICAR ip=%s ruta=%s (redirigido a login)", ip, request.path
             )
         return response
+
+
+class PrestamosVencidosMiddleware:
+    """Al iniciar sesión, marca préstamos vencidos y avisa al usuario (RF4)."""
+
+    CLAVE_SESION = "alerta_vencidos_revisada"
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user = request.user
+        if user.is_authenticated and not request.session.get(self.CLAVE_SESION):
+            request.session[self.CLAVE_SESION] = True
+            hoy = timezone.localdate()
+            Prestamo.objects.filter(
+                estado=Prestamo.Estado.ACTIVO, fecha_devolucion_prevista__lt=hoy
+            ).update(estado=Prestamo.Estado.VENCIDO)
+            vencidos = Prestamo.objects.filter(
+                docente=user, estado=Prestamo.Estado.VENCIDO
+            ).count()
+            if vencidos:
+                messages.warning(
+                    request,
+                    f"Tiene {vencidos} préstamo(s) vencido(s). Devuélvalos lo antes posible.",
+                )
+                logger.warning("ALERTA VENCIDOS usuario=%s vencidos=%s", user.username, vencidos)
+        return self.get_response(request)
