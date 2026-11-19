@@ -28,7 +28,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Los middleware propios se registran aquí a medida que se implementan.
+    "prestamos.middleware.AuditoriaMiddleware",
+    "prestamos.middleware.PrestamosVencidosMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -44,6 +45,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "prestamos.context.roles",
             ],
         },
     },
@@ -72,3 +74,58 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# ---------------------------------------------------------------------------
+# Autenticación, sesiones y seguridad  (dev/integrante-2)
+# ---------------------------------------------------------------------------
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "inicio"
+LOGOUT_REDIRECT_URL = "login"
+
+# Contraseñas hasheadas con PBKDF2 (hasher por defecto de Django).
+# Timeout por inactividad: 30 minutos. SAVE_EVERY_REQUEST renueva la
+# caducidad en cada petición, de modo que solo expira si NO hay actividad.
+SESSION_COOKIE_AGE = 1800  # 30 min * 60
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Cookies seguras
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+# Logging de auditoría: consola (para la captura) + archivo logs/auditoria.log
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "auditoria": {
+            "format": "[{asctime}] {levelname} {name} | {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "consola": {"class": "logging.StreamHandler", "formatter": "auditoria"},
+        "archivo": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "auditoria.log",
+            "encoding": "utf-8",
+            "formatter": "auditoria",
+        },
+    },
+    "loggers": {
+        "auditoria": {
+            "handlers": ["consola", "archivo"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

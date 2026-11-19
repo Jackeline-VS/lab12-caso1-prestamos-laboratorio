@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="card">
+  <h2>Bienvenido, {{ user.get_full_name|default:user.get_username }}</h2>
+  <p>Rol:
+    {% if rol_admin %}Administrador{% endif %}{% if rol_docente %}Docente{% endif %}{% if rol_asistente %}Asistente{% endif %}
+    {% if not rol_admin and not rol_docente and not rol_asistente %}Sin rol asignado{% endif %}
+  </p>
+  <p>Use el menú superior para consultar el catálogo y gestionar préstamos.</p>
+</div>
+{% endblock %}

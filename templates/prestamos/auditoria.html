@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Auditoría{% endblock %}
+{% block contenido %}
+<div class="card">
+  <h2>Registro de auditoría (últimos 200)</h2>
+  <table>
+    <tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>IP</th><th>Detalle</th></tr>
+    {% for r in registros %}
+    <tr><td>{{ r.fecha|date:"d/m/Y H:i:s" }}</td><td>{{ r.usuario.username|default:"anónimo" }}</td><td>{{ r.accion }}</td><td>{{ r.ip }}</td><td>{{ r.detalle }}</td></tr>
+    {% empty %}<tr><td colspan="5">Sin registros.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
